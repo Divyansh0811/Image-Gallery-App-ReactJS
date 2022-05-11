@@ -1,13 +1,17 @@
 import './App.css';
 import axios from "axios"
-import {useState, useEffect} from "react"
-import {FaSearch} from 'react-icons/fa'
+import {useState, useEffect, useCallback} from "react"
 import ImageModal from './Components/ImageModal/ImageModal';
+import DetailsModal from './Components/detailsModal/DetailsModal';
 function App() {
   const API_LINK = "https://api.unsplash.com/photos/?client_id=7e77ZDTiplGh4iAI_dDimxMd3OLP-_Gi3IsQgpcaAOI"
   const [images, setImages] = useState([])
   const [searchKeyword, setSearchKeyword] = useState("")
   const [result, setResult] = useState([])
+  const [openModal, setOpenModal] = useState(false)
+  const [download, setDownload] = useState('')
+  const [previewImage, setPreviewImage] = useState('');
+  const [tags, setTags] = useState([])
 
   
   const getImages = () => {
@@ -15,45 +19,70 @@ function App() {
       setImages(response.data)
     })
   }
-  const changePhoto = () => {
+  const searchPhoto = () => {
     axios.get(`https://api.unsplash.com/search/photos?page=1&query=${searchKeyword}&client_id=7e77ZDTiplGh4iAI_dDimxMd3OLP-_Gi3IsQgpcaAOI`).then((response) => {
       setResult(response.data.results)
     })
   }
+
+  const debounce = (fn, delay) => {
+    var timer = null;
+    return function() {
+      var context = this,
+        args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        fn.apply(context, args);
+      }, delay);
+    };
+  }
+  const handleChangeState = (e) => {
+    setSearchKeyword(e.target.value)
+  }
+  const debounceStateChange = useCallback(debounce(handleChangeState, 200), []);
+  const getDetails = async (id) => {
+    await axios.get(`https://api.unsplash.com/photos/${id}?client_id=7e77ZDTiplGh4iAI_dDimxMd3OLP-_Gi3IsQgpcaAOI`).then((response)=>{
+      setDownload(response.data.links.download_location)
+      setPreviewImage(response.data.urls.regular)
+      setTags(response.data.tags)
+    })
+    setOpenModal(true)
+  }
   useEffect(() => {
     getImages()
-  })
+  },[])
+  
   useEffect(() => {
-    changePhoto()
+    searchPhoto()
   }, [searchKeyword])
 
   return (
     <div className="App">
       <div className='search-bar'>
-      <span>ImageMart</span>
-      <input type="text" className="search-bar" value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value) }/>
-      <button type='submit' onClick={changePhoto}>
-        <FaSearch /> 
-      </button>
+        <span className='title'>ImageMart</span>
+        <input type="text"  placeholder="Type keyword..." onChange={debounceStateChange}/>
       </div>
+      
       <div className='images-div'>
+        {/* If no query then no data is received, hence rendering conditionally based on search image input*/}
         { searchKeyword === '' ? (
           images.map((value, index) => {
             return(
-              <ImageModal image={value.urls.small} username={value.user.username} likes={value.likes} key={index}/>
+              <ImageModal image={value.urls.small} username={value.user.username} likes={value.likes} id={value.id} onClick={getDetails} key={index}/>
             )
           }) 
         ):
           (
-            result.map((value, index) => {
+            result.map((value) => {
               return(
-                <ImageModal image={value.urls.small} username={value.user.username} likes={value.likes} key={index}/>
+                <ImageModal image={value.urls.small} username={value.user.username} likes={value.likes} id={value.id}/>
               )
             })
           )
         }
 
       </div>
+      {openModal && <DetailsModal image={previewImage} download={download} tags={tags} closeModal={setOpenModal}/>}
     </div>
   );
 }

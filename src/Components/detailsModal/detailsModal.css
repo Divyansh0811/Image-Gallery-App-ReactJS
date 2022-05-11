@@ -1,0 +1,12 @@
+.details-modal{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+img{
+  height: 50vh;
+  width: 30vh;
+}
+btn{
+  position: absolute;
+}
