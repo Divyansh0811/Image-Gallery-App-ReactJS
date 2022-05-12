@@ -39,7 +39,10 @@ input{
   font-size: 20px;
   background: none;
 }
-
+::placeholder { 
+  color: black;
+  opacity: 1; 
+}
 input:focus{
   outline: none;
 }
