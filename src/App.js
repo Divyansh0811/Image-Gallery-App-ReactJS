@@ -11,6 +11,11 @@ function App() {
   const [openModal, setOpenModal] = useState(false)
   const [download, setDownload] = useState('')
   const [previewImage, setPreviewImage] = useState('');
+  const [likes, setLikes] = useState('');
+  const [userLink, setUserLink] = useState('');
+  const [userName, setUserName] = useState('');
+  const [views, setViews] = useState(0);
+  const [downloads, setDownloads] = useState(0);
   const [tags, setTags] = useState([])
 
   
@@ -42,9 +47,15 @@ function App() {
   const debounceStateChange = useCallback(debounce(handleChangeState, 200), []);
   const getDetails = async (id) => {
     await axios.get(`https://api.unsplash.com/photos/${id}?client_id=7e77ZDTiplGh4iAI_dDimxMd3OLP-_Gi3IsQgpcaAOI`).then((response)=>{
+      console.log(response)
       setDownload(response.data.links.download_location)
       setPreviewImage(response.data.urls.regular)
       setTags(response.data.tags)
+      setLikes(response.data.likes)
+      setUserLink(response.data.user.links.html)
+      setUserName(response.data.user.name)
+      setDownloads(response.data.downloads)
+      setViews(response.data.views)
     })
     setOpenModal(true)
   }
@@ -82,7 +93,7 @@ function App() {
         }
 
       </div>
-      {openModal && <DetailsModal image={previewImage} download={download} tags={tags} closeModal={setOpenModal}/>}
+      {openModal && <DetailsModal image={previewImage} download={download} tags={tags} closeModal={setOpenModal} likes={likes} userLink={userLink} userName={userName} views={views} downloads={downloads}/>}
     </div>
   );
 }
