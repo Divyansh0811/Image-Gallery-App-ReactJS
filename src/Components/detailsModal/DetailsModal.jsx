@@ -1,4 +1,4 @@
-import React from 'react'
+import './detailsModal.css'
 import axios from 'axios'
 const DetailsModal = ({image, download, tags, closeModal}) => {
 
@@ -20,12 +20,12 @@ const DetailsModal = ({image, download, tags, closeModal}) => {
    };
   return (
     <div className='details-modal'>
-      <button className='btn'onClick={() => closeModal(false)}>X</button>
-      <img src={image} alt="error"/>
+      <img className='details-modal-image' src={image} alt="error"/>
       <div className='details-modal-content'>
-      <button onClick={handleDownload}>Download</button>
+      <button className='btn' onClick={handleDownload}>Download</button>
+      <button className='btn' onClick={() => closeModal(false)}>Close</button>
         <div className='detail-modal-tags'>
-          {tags.map((value) => <p> {value.title}</p> )}
+          {tags.map((value) => <p> #{value.title}  </p> )}
         </div>
       </div>
     </div>

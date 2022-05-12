@@ -73,9 +73,9 @@ function App() {
           }) 
         ):
           (
-            result.map((value) => {
+            result.map((value, index) => {
               return(
-                <ImageModal image={value.urls.small} username={value.user.username} likes={value.likes} id={value.id}/>
+                <ImageModal image={value.urls.small} username={value.user.username} likes={value.likes} onClick={getDetails} id={value.id} key={index}/>
               )
             })
           )
